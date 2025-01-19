@@ -11,13 +11,18 @@ string getPassword()
     string password;
     char ch;
     cout << "Enter your password: ";
-    while ((ch = _getch()) != '\r') {  // '\r' is the carriage return (Enter key)
-        if (ch == '\b') {  // Handle backspace
-            if (!password.empty()) {
+    while ((ch = _getch()) != '\r') 
+	{  // '\r' is the carriage return (Enter key)
+        if (ch == '\b') 
+		{  // Handle backspace
+            if (!password.empty()) 
+			{
                 password.resize(password.size() - 1);  // Remove last character
                 cout << "\b \b";  // Move cursor back, overwrite with space, move back again
             }
-        } else {
+        } 
+		else 
+		{
             password += ch;
             cout << '*';
         }
@@ -31,8 +36,10 @@ int accountExists()
 {
     ifstream file("users.txt");
     string storedUser, storedPass;
-    if (file.is_open()) {
-        if (file >> storedUser >> storedPass) {
+    if (file.is_open()) 
+	{
+        if (file >> storedUser >> storedPass) 
+		{
             file.close();
             return 1;  // Account exists
         }
@@ -47,27 +54,34 @@ int logIn()
     string username, password, storedUser, storedPass;
     int attempts = 3;
 
-    while (attempts > 0) {
+    while (attempts > 0) 
+	{
         cout << "Enter your username: ";
         cin >> username;
         cin.ignore();  // To ignore the newline character after the username input
         password = getPassword();
 
         ifstream file("users.txt");
-        if (file.is_open()) {
-            while (file >> storedUser >> storedPass) {
-                if (storedUser == username && storedPass == password) {
+        if (file.is_open()) 
+		{
+            while (file >> storedUser >> storedPass) 
+			{
+                if (storedUser == username && storedPass == password) 
+				{
                     file.close();
                     return 1;  // Login successful
                 }
             }
             file.close();
-        } else {
+        } 
+		else 
+		{
             cout << "Error opening file.\n";
         }
 
         attempts--;
-        if (attempts > 0) {
+        if (attempts > 0) 
+		{
             cout << "Invalid username or password. You have " << attempts << " attempt(s) left.\n";
         }
     }
@@ -77,11 +91,15 @@ int logIn()
 
 // Function to sign up a new user
 void signUp() {
-    if (accountExists()) {
+    if (accountExists()) 
+	{
         cout << "An account already exists. Redirecting to login...\n";
-        if (logIn() == 1) {
+        if (logIn() == 1) 
+		{
             cout << "Login successful!\n";
-        } else {
+        } 
+		else 
+		{
             cout << "Invalid username or password.\n";
         }
         return;
@@ -94,31 +112,42 @@ void signUp() {
     password = getPassword();
 
     ofstream file("users.txt", ios::app);
-    if (file.is_open()) {
+    if (file.is_open()) 
+	{
         file << username << " " << password << endl;
         file.close();
         cout << "Sign up successful!\n";
-    } else {
+    } else 
+	{
         cout << "Error opening file.\n";
     }
 }
 
-int main() {
+int main() 
+{
     int choice;
     cout << "1. Sign Up\n";
     cout << "2. Log In\n";
     cout << "Enter your choice: ";
     cin >> choice;
 
-    if (choice == 1) {
+    if (choice == 1) 
+	{
         signUp();
-    } else if (choice == 2) {
-        if (logIn() == 1) {
+    } 
+	else if (choice == 2) 
+	{
+        if (logIn() == 1) 
+		{
             cout << "Login successful!\n";
-        } else {
+        } 
+		else 
+		{
             cout << "Invalid username or password.\n";
         }
-    } else {
+    } 
+	else 
+	{
         cout << "Invalid choice.\n";
     }
 
