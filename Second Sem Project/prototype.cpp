@@ -183,6 +183,117 @@ void shopping::menu()
             goto pass;
     }
 };
+void shopping :: admin()
+{
+	m:
+	int choice;
+	cout<<"\n\n\n\t\t\tADMIN SECTION";
+	cout<<"\n\n\n\t\t|______1) Add the product|";
+	cout<<"\n\n\n\t\t|______2) Modify the product|";
+	cout<<"\n\n\n\t\t|______3) Delete the product|";
+	cout<<"\n\n\n\t\t|______4) Back To Main Menu|";
+	
+	cout<<"\n\n\t\t Enter:";
+	cin>>choice;
+	
+	switch(choice)
+	{
+		case 1:
+			add();
+			break;
+		case 2:
+			edit();
+			break;
+		case 3:
+			rem();
+			break;
+		case 4:
+			menu();
+			break;
+			
+		default:
+			cout<<"Invalid Choice, Enter Again";
+	}
+	goto m;
+}
+
+void shopping::buyer()
+{
+	m:
+	int choice;
+	cout<<"\t\t\t MENU";
+	cout<<"\t\t\t ___________\n";
+	cout<<"                  \n";
+	cout<<"\t\t 1) Buy Product\n";
+	cout<<"                  \n";
+	cout<<"\t\t 2) Go Back   \n";
+	cout<<"\t\t Enter:";
+	cin>>choic;
+	switch(choice)
+	{
+		case 1:
+			receipt();
+			break;
+			
+		case 2;
+		menu();
+		default:
+			cout<<"Invalid choice";
+	}
+	goto m;
+}
+void shopping::add()
+{
+	fstream data;
+	int c;
+	int token=0;
+	float p;
+	float d;
+	string n;
+	
+	cout<<"\n\n\t\t\t Add New Product";
+	cout<<"\n\n\t Product Code of the Product:";
+	cint>>pcode;
+	cout<<"\n\n\t Name of the product:";
+	cin>>pname;
+	cout<<"\n\n\t Price of the product:";
+	cin>>price;
+	cout<<"\n\n\t Discount on Product:";
+	cin>>dis;
+	
+	data.open("database.txt",ios::in);
+	if(!data)
+	{
+		data.open("database.txt",ios::app|ios::out);
+		data<<" "<<pcode<<" "<<pname<<" "<<price<<" "<<dis<<"\n";
+		data.close();	
+	}
+	else
+	{
+		data>>c>>n>>p>>d;
+		while(!data.eof())
+		{
+			if(c==pcode)
+			{
+				token++;
+			}
+			data>>c>>n>>p>>d;
+		}
+		data.close();
+		
+		if(token==1)
+		{
+		goto m;
+		}
+		else
+		{
+		data.open("database.txt",ios::app|ios::out);
+		data<<" "<<pcode<<" "<<pname<<" "<<price<<" "<<dis<<"\n";
+		data.close();
+		}
+	}
+	cout<<"\n\n\t\t Recorded Successfully!!!";
+}
 int main() 
 {
     shopping obj;
