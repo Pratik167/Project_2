@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <conio.h>
+#include <windows.h>
+#include <iomanip>
 using namespace std;
 
 class permission;
@@ -22,6 +24,7 @@ public:
     void rem();
     void list();
     void receipt();
+    void loggedInMenu();
     friend class permission;
 };
 
@@ -71,9 +74,12 @@ public:
 
     void signUp() 
 	{
+		system("cls");
+		cout<<"\t\t\t\tSIGN UP PAGE\n";
         if (accountExists()) 
 		{
             cout << "An account already exists. Redirecting to login...\n";
+            
             if (logIn() == 1) 
 			{
                 cout << "Login successful!\n";
@@ -106,6 +112,8 @@ public:
 
     int logIn() 
 	{
+		system("cls");
+		cout<<"\t\t\t\t\tLOGIN PAGE\n";
         string username, password, storedUser, storedPass;
         int attempts = 3;
 
@@ -145,7 +153,7 @@ public:
     }
 };
 // shopping class ko member functions
-void shopping::menu()
+void shopping::menu() 
 {
     int choice;
     permission perm;
@@ -157,8 +165,8 @@ void shopping::menu()
     cout << "\t\t\t 1. Signup \n";
     cout << "\t\t\t 2. Login \n";
     cout << "\t\t\t 3. Exit  \n";
-    pass:
-    cout << "\t\t\t Choice:";
+pass:
+    cout << "\t\t\t Choice: ";
     cin >> choice;
 
     switch (choice) 
@@ -170,6 +178,20 @@ void shopping::menu()
             if (perm.logIn()) 
 			{
                 cout << "Login successful!\n";
+                for (int q=0;q<3;q++)
+					{
+                        Sleep(100);
+                        printf(".");
+                        Sleep(100);
+                        printf(".");
+                        Sleep(100);
+                        printf(".");
+                        Sleep(200);
+                        printf("\b \b");
+                        printf("\b \b");
+                        printf("\b \b");
+                    }
+                loggedInMenu();  // Call the logged-in menu
             } 
 			else 
 			{
@@ -182,9 +204,42 @@ void shopping::menu()
             cout << "Invalid choice! Please try again.\n";
             goto pass;
     }
-};
+}
+
+void shopping::loggedInMenu() 
+{
+	system("cls");
+    int choice;
+    while (true) 
+	{
+        cout << "\n\n\t\t\t Welcome to the Main Menu\n";
+        cout << "\t\t\t _________________________\n";
+        cout << "\t\t\t 1. Admin (Modify Menu)\n";
+        cout << "\t\t\t 2. Buyer (Generate Invoice)\n";
+        cout << "\t\t\t 3. Exit\n";
+        cout << "\t\t\t Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) 
+		{
+            case 1:
+                admin();  // Navigate to admin section
+                break;
+            case 2:
+                buyer();  // Navigate to buyer section
+                break;
+            case 3:
+                cout << "\nExiting the system. Goodbye!\n";
+                exit(0);  // Exit the program
+            default:
+                cout << "\nInvalid choice. Please try again.\n";
+        }
+    }
+}
+
 void shopping :: admin()
 {
+	system("cls");
 	m:
 	int choice;
 	cout<<"\n\n\n\t\t\tADMIN SECTION";
@@ -208,7 +263,7 @@ void shopping :: admin()
 			rem();
 			break;
 		case 4:
-			menu();
+			loggedInMenu();
 			break;
 			
 		default:
@@ -221,12 +276,15 @@ void shopping::buyer()
 {
 	m:
 	int choice;
+	system("cls");
 	cout<<"\t\t\t MENU";
-	cout<<"\t\t\t ___________\n";
+	cout<<"\n\t\t\t ___________\n";
 	cout<<"                  \n";
-	cout<<"\t\t 1) Buy Product\n";
+	cout<<"\t\t 1) Generate Invoice\n";
 	cout<<"                  \n";
 	cout<<"\t\t 2) Go Back   \n";
+	cout<<"                  \n";
+	cout<<"\t\t 3) Exit   \n";
 	cout<<"\t\t Enter:";
 	cin>>choice;
 	switch(choice)
@@ -237,6 +295,23 @@ void shopping::buyer()
 			
 		case 2:
 		menu();
+		
+		case 3:
+			cout<<"Exiting The Program!!!";
+			for (int q=0;q<3;q++)
+					{
+                        Sleep(100);
+                        printf(".");
+                        Sleep(100);
+                        printf(".");
+                        Sleep(100);
+                        printf(".");
+                        Sleep(200);
+                        printf("\b \b");
+                        printf("\b \b");
+                        printf("\b \b");
+                    }
+			exit(0);
 		default:
 			cout<<"Invalid choice";
 	}
@@ -244,6 +319,7 @@ void shopping::buyer()
 }
 void shopping::add()
 {
+	system("cls");
 	fstream data;
 	int c;
 	int token=0;
@@ -251,6 +327,7 @@ void shopping::add()
 	float d;
 	string n;
 	m:
+	list();
 	cout<<"\n\n\t\t\t Add New Product";
 	cout<<"\n\n\t Product Code of the Product:";
 	cin>>pcode;
@@ -296,6 +373,7 @@ void shopping::add()
 }
 void shopping::edit()
 {
+	system("cls");
 	fstream data,data1;
 	int pkey;
 	int token=0;
@@ -303,6 +381,7 @@ void shopping::edit()
 	float p;
 	float d;
 	string n;
+	list();
 	cout<<"\n\t\t\t Modify Item";
 	cout<<"\n\t\t\t Product Code:";
 	cin>>pkey;
@@ -349,6 +428,8 @@ void shopping::edit()
 }
 void shopping::rem()
 {
+	system("cls");
+	list();
 	fstream data,data1;
 	int pkey;
 	int token=0;
@@ -389,25 +470,188 @@ void shopping::rem()
 }
 void shopping::list()
 {
-	fstream data;
-	data.open("database.txt",ios::in);
-	cout<<"\n\n|_____________________________________________________\n";
-	cout<<"ProNo\t\tName\t\tPrice\n";
-	cout<<"\n\n|_____________________________________________________\n";
-	data>>pcode>>pname>>price>>dis;
-	while(!data.eof())
-	{
-		cout<<pcode<"\t\t"<<pname<<"\t\t"<<price<<"\n";
-		data>>pcode>>pname>>price>>dis;
-	}
-	data.close();
+    system("cls");
+    fstream data;
+    data.open("database.txt", ios::in);
+    cout << "\n\n|____________________MENU_________________________\n";
+    cout << "| ProNo    Name                      Price\n";
+    cout << "|_____________________________________________\n";
+    if (!data)
+    {
+        cout << "No products available.\n";
+        return;
+    }
+
+    data >> pcode >> pname >> price >> dis;
+    while (!data.eof())
+    {
+        cout << setw(8) << left << pcode
+             << setw(25) << left << pname
+             << setw(10) << left << price << "\n";
+        data >> pcode >> pname >> price >> dis;
+    }
+    data.close();
 }
 void shopping::receipt()
 {
-	
+    system("cls");
+    fstream data;
+    int arrc[100]; // array of product codes
+    int arrq[100]; // array of quantities
+    char choice;
+    int c = 0;
+    float amount = 0, dis = 0, total = 0;
+
+    string customerName;  // Variable to store customer name
+    cout << "\n\n\t\t\t\t RECEIPT";
+    cout << "\n\n Enter Customer's Name: ";
+    cin.ignore();  // Clear the input buffer
+    getline(cin, customerName);  // Get the full name including spaces
+
+    data.open("database.txt", ios::in);
+    if (!data)
+    {
+        cout << "\n\n Empty!!!";
+        return;
+    }
+    data.close();
+    list();
+    cout << "\n ________________________________________\n";
+    cout << "                Place Order              \n";
+    cout << "_________________________________________\n";
+
+    do
+    {
+        cout << "\n\n Enter Product Code: ";
+        cin >> arrc[c];
+        cout << "\n\n Enter the Product Quantity: ";
+        cin >> arrq[c];
+
+        for (int i = 0; i < c; i++)
+        {
+            if (arrc[c] == arrc[i])
+            {
+                cout << "\n\n Duplicate Product Code. Try AGAIN!!!";
+                goto retry;
+            }
+        }
+        c++;
+        cout << "\n\n Do you want to buy another product? (y/n): ";
+        cin >> choice;
+
+    retry:
+        continue;
+    } while (choice == 'y');
+
+    cout << "\n\n\t\t\t__________________INVOICE_________________\n";
+    cout << "Customer Name: " << customerName << "\n";  // Display customer name in the invoice
+    cout << "Product No   Product Name            Quantity   Price     Amount      Discounted Amount\n";
+    cout << "________________________________________________________________________________________\n";
+
+    for (int i = 0; i < c; i++)
+    {
+        data.open("database.txt", ios::in);
+        data >> pcode >> pname >> price >> dis;
+        while (!data.eof())
+        {
+            if (pcode == arrc[i])
+            {
+                amount = price * arrq[i];
+                dis = amount - (amount * dis / 100); // Apply individual product discount
+                total += dis;
+                cout << setw(12) << left << pcode
+                     << setw(25) << left << pname
+                     << setw(10) << left << arrq[i]
+                     << setw(10) << left << price
+                     << setw(12) << left << amount
+                     << setw(10) << left << dis << "\n";
+            }
+            data >> pcode >> pname >> price >> dis;
+        }
+        data.close();
+    }
+
+    // Check if the total is greater than or equal to 500
+    if (total >= 500)
+    {
+        float discount = total * 0.10; // 10% discount
+        total -= discount;
+        cout << "_______________________________________________\n";
+        cout << "Total after 10% discount: " << total << "\n";
+    }
+
+    cout << "________________________________________________________________________________________\n";
+    cout << "Total Amount: " << total << "\n";
+
+    // Ask if the user wants to save the invoice
+    char saveChoice;
+    cout << "\nDo you want to save this invoice? (y/n): ";
+    cin >> saveChoice;
+
+    if (saveChoice == 'y' || saveChoice == 'Y')
+    {
+        ofstream invoiceFile;
+        invoiceFile.open("invoice.txt", ios::app);  // Open invoice.txt in append mode to keep adding invoices
+
+        if (invoiceFile.is_open())
+        {
+            invoiceFile << "\n\n\t\t\t__________________INVOICE_________________\n";
+            invoiceFile << "Customer Name: " << customerName << "\n";  // Save the customer name in the invoice file
+            invoiceFile << "Product No   Product Name            Quantity   Price     Amount      Discounted Amount\n";
+            invoiceFile << "________________________________________________________________________________________\n";
+
+            for (int i = 0; i < c; i++)
+            {
+                data.open("database.txt", ios::in);
+                data >> pcode >> pname >> price >> dis;
+                while (!data.eof())
+                {
+                    if (pcode == arrc[i])
+                    {
+                        amount = price * arrq[i];
+                        dis = amount - (amount * dis / 100); // Apply individual product discount
+                        invoiceFile << setw(12) << left << pcode
+                                    << setw(25) << left << pname
+                                    << setw(10) << left << arrq[i]
+                                    << setw(10) << left << price
+                                    << setw(12) << left << amount
+                                    << setw(10) << left << dis << "\n";
+                    }
+                    data >> pcode >> pname >> price >> dis;
+                }
+                data.close();
+            }
+
+            // Apply total discount if applicable
+            if (total >= 500)
+            {
+                float discount = total * 0.10; // 10% discount
+                total -= discount;
+                invoiceFile << "_______________________________________________\n";
+                invoiceFile << "Total after 10% discount: " << total << "\n";
+            }
+
+            invoiceFile << "________________________________________________________________________________________\n";
+            invoiceFile << "Total Amount: " << total << "\n";
+            invoiceFile.close();
+
+            cout << "\nInvoice saved to 'invoice.txt'.\n";
+        }
+        else
+        {
+            cout << "\nError saving the invoice.\n";
+        }
+    }
+    else
+    {
+        cout << "\nInvoice not saved.\n";
+    }
 }
+
+
 int main() 
 {
+	system("color 2");
     shopping obj;
     obj.menu();
     return 0;
