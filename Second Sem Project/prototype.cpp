@@ -25,6 +25,8 @@ public:
     void list();
     void receipt();
     void loggedInMenu();
+    void showAllInvoices();
+    void searchInvoice();
     friend class permission;
 };
 
@@ -74,48 +76,82 @@ public:
 
     void signUp() 
 	{
-		system("cls");
-		cout<<"\t\t\t\tSIGN UP PAGE\n";
-        if (accountExists()) 
-		{
-            cout << "An account already exists. Redirecting to login...\n";
-            
-            if (logIn() == 1) 
-			{
-                cout << "Login successful!\n";
-            } 
-			else 
-			{
-                cout << "Invalid username or password.\n";
-            }
-            return;
+    system("cls");
+    cout << "\t\t\t\tSIGN UP PAGE\n";
+    
+    if (accountExists()) 
+    {
+        cout << "An account already exists. Redirecting to login...\n";
+        for (int q = 0; q < 3; q++) 
+        {
+            Sleep(100);printf(".");Sleep(100);printf(".");Sleep(100);printf(".");Sleep(200);printf("\b \b");printf("\b \b");printf("\b \b");
         }
-
-        string username, password;
-        cout << "Enter a new username: ";
-        cin >> username;
-        cin.ignore();  // To ignore the newline character after the username input
-        password = getPassword();
-
-        ofstream file("users.txt", ios::app);
-        if (file.is_open()) 
-		{
-            file << username << " " << password << endl;
-            file.close();
-            cout << "Sign up successful!\n";
+        
+        if (logIn() == 1) 
+        {
+            cout << "Login successful!\n";
+            shopping obj;  // Create shopping object to access loggedInMenu
+            obj.loggedInMenu();  // Call loggedInMenu after successful login
         } 
-		else 
-		{
-            cout << "Error opening file.\n";
+        else 
+        {
+            cout << "Invalid username or password.\n";
         }
+        return;  // End the signUp function and prevent further execution
     }
 
+    string username, password;
+    cout << "Enter a new username: ";
+    cin >> username;
+    cin.ignore();  // To ignore the newline character after the username input
+    password = getPassword();
+
+    ofstream file("users.txt", ios::app);
+    if (file.is_open()) 
+    {
+        file << username << " " << password << endl;
+        file.close();
+        cout << "Sign up successful!\n";
+        for (int q = 0; q < 3; q++) 
+        {
+            Sleep(100);printf(".");Sleep(100);printf(".");Sleep(100);printf(".");Sleep(200);printf("\b \b");printf("\b \b");printf("\b \b");
+        }
+        shopping obj;
+        obj.loggedInMenu();
+    } 
+    else 
+    {
+        cout << "Error opening file.\n";
+    }
+}
     int logIn() 
 	{
 		system("cls");
 		cout<<"\t\t\t\t\tLOGIN PAGE\n";
         string username, password, storedUser, storedPass;
         int attempts = 3;
+        
+        ifstream file("users.txt");
+    if (!file || file.peek() == ifstream::traits_type::eof()) 
+    {
+        cout << "No users found. Please sign up first.\n";
+        file.close();
+        for (int q = 0; q < 3; q++) 
+        {
+            Sleep(100);
+            printf(".");
+            Sleep(100);
+            printf(".");
+            Sleep(100);
+            printf(".");
+            Sleep(200);
+            printf("\b \b");
+            printf("\b \b");
+            printf("\b \b");
+        }
+        signUp();
+        return 0; // No users, cannot log in
+    }
 
         while (attempts > 0) 
 		{
@@ -275,47 +311,112 @@ void shopping :: admin()
 void shopping::buyer()
 {
 	m:
-	int choice;
-	system("cls");
-	cout<<"\t\t\t MENU";
-	cout<<"\n\t\t\t ___________\n";
-	cout<<"                  \n";
-	cout<<"\t\t 1) Generate Invoice\n";
-	cout<<"                  \n";
-	cout<<"\t\t 2) Go Back   \n";
-	cout<<"                  \n";
-	cout<<"\t\t 3) Exit   \n";
-	cout<<"\t\t Enter:";
-	cin>>choice;
-	switch(choice)
-	{
-		case 1:
-			receipt();
-			break;
-			
-		case 2:
-		menu();
-		
-		case 3:
-			cout<<"Exiting The Program!!!";
-			for (int q=0;q<3;q++)
-					{
-                        Sleep(100);
-                        printf(".");
-                        Sleep(100);
-                        printf(".");
-                        Sleep(100);
-                        printf(".");
-                        Sleep(200);
-                        printf("\b \b");
-                        printf("\b \b");
-                        printf("\b \b");
-                    }
-			exit(0);
-		default:
-			cout<<"Invalid choice";
-	}
-	goto m;
+    system("cls");
+    int choice;
+    cout << "\t\t\t  Buyer  \n";
+    cout << "__________________________________________\n";
+    cout << "1) Buy Product\n";
+    cout << "2) Show All Invoices\n";
+    cout << "3) Search Invoice\n";
+    cout << "4) Go Back\n";
+    cout<<  "5) Exit\n";
+    cout << "Enter your choice: ";
+    cin >> choice;
+
+    switch (choice)
+    {
+    case 1:
+        receipt();
+        break;
+    case 2:
+        showAllInvoices();
+        break;
+    case 3:
+        searchInvoice();
+        break;
+    case 4:
+        return;
+    case 5:
+    cout<<"\n\nThanks";
+    exit(0);
+    default:
+        cout << "Invalid choice! Try again.";
+        goto m;
+    }
+}
+void shopping::showAllInvoices()
+{
+    system("cls");
+    ifstream invoiceFile("invoice.txt");
+    if (!invoiceFile)
+    {
+        cout << "\nNo invoices found!\n";
+        return;
+    }
+    string line;
+    cout << "\n\t\t All Invoices \n";
+    cout << "----------------------------------------\n";
+    while (getline(invoiceFile, line))
+    {
+        cout << line << "\n";
+    }
+    invoiceFile.close();
+}
+
+void shopping::searchInvoice()
+{
+    system("cls");
+    ifstream invoiceFile("invoice.txt");
+    if (!invoiceFile)
+    {
+        cout << "\nNo invoices found!\n";
+        return;
+    }
+
+    string keyword;
+    cout << "Enter Customer Name to search: ";
+    cin.ignore();
+    getline(cin, keyword);
+
+    // Check if input contains numbers
+    if (keyword.find_first_of("0123456789") != string::npos) 
+    {
+        cout << "Please enter the name correctly (no numbers allowed)." << endl;
+        return;
+    }
+
+    string line;
+    cout << "\n\t\tSearch Results\n";
+    cout << "----------------------------------------\n";
+
+    bool found = false;  // Flag to track if any invoice is found
+
+    // Go through each line and check if it contains the customer name
+    while (getline(invoiceFile, line))
+    {
+        if (line.find(keyword) != string::npos)  // If the customer name is found in the line
+        {
+            found = true;  // Set the flag to true
+            cout << "\nInvoice found for: " << keyword << endl;
+
+            // Print the full invoice until you reach a separator or end of invoice
+            // You can adjust this part to fit how your invoice details are organized
+            string invoiceContent;
+            while (getline(invoiceFile, invoiceContent) && !invoiceContent.empty())
+            {
+                cout << invoiceContent << endl;  // Print the entire invoice details
+            }
+
+            cout << "\n----------------------------------------\n";
+        }
+    }
+
+    if (!found)  // If no matching invoice is found
+    {
+        cout << "\nNo matching invoice found for the customer: " << keyword << endl;
+    }
+
+    invoiceFile.close();
 }
 void shopping::add()
 {
