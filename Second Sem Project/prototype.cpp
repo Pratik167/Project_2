@@ -3,6 +3,7 @@
 #include <conio.h>
 #include <windows.h>
 #include <iomanip>
+#include <limits>
 using namespace std;
 
 class permission;
@@ -283,7 +284,6 @@ void shopping :: admin()
 	cout<<"\n\n\n\t\t|______2) Modify the product|";
 	cout<<"\n\n\n\t\t|______3) Delete the product|";
 	cout<<"\n\n\n\t\t|______4) Back To Main Menu|";
-	
 	cout<<"\n\n\t\t Enter:";
 	cin>>choice;
 	
@@ -300,8 +300,7 @@ void shopping :: admin()
 			break;
 		case 4:
 			loggedInMenu();
-			break;
-			
+			break;	
 		default:
 			cout<<"Invalid Choice, Enter Again";
 	}
@@ -317,7 +316,7 @@ void shopping::buyer()
     cout << "__________________________________________\n";
     cout << "1) Buy Product\n";
     cout << "2) Show All Invoices\n";
-    cout << "3) Search Invoice\n";
+    cout << "3) Show Invoice\n";
     cout << "4) Go Back\n";
     cout<<  "5) Exit\n";
     cout << "Enter your choice: ";
@@ -328,9 +327,7 @@ void shopping::buyer()
     case 1:
         receipt();
         break;
-    case 2:
-        showAllInvoices();
-        break;
+    
     case 3:
         searchInvoice();
         break;
@@ -418,6 +415,24 @@ void shopping::searchInvoice()
 
     invoiceFile.close();
 }
+int getNumberInput()
+{
+	int x;
+	 while (true) 
+	 {
+        cin>>x;
+
+        // Check if input is a valid number
+        if (cin.fail()) {
+            cin.clear();  // Clear the error flag
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Ignore invalid input
+            cout << "Invalid input. Please enter a number: ";
+        } else {
+        	return x;
+            break;  // Valid number entered
+        }
+    }
+}
 void shopping::add()
 {
 	system("cls");
@@ -431,13 +446,13 @@ void shopping::add()
 	list();
 	cout<<"\n\n\t\t\t Add New Product";
 	cout<<"\n\n\t Product Code of the Product:";
-	cin>>pcode;
+	pcode=getNumberInput();
 	cout<<"\n\n\t Name of the product:";
 	cin>>pname;
 	cout<<"\n\n\t Price of the product:";
-	cin>>price;
+	price=getNumberInput();
 	cout<<"\n\n\t Discount on Product:";
-	cin>>dis;
+	dis=getNumberInput();
 	
 	data.open("database.txt",ios::in);
 	if(!data)
@@ -485,7 +500,7 @@ void shopping::edit()
 	list();
 	cout<<"\n\t\t\t Modify Item";
 	cout<<"\n\t\t\t Product Code:";
-	cin>>pkey;
+	pkey=getNumberInput();
 	data.open("database.txt",ios::in);
 	if(!data)
 	{
@@ -500,13 +515,13 @@ void shopping::edit()
 			if(pkey==pcode)
 			{
 				cout<<"\n\t\t Product New Code:";
-				cin>>c;
+				c=getNumberInput();
 				cout<<"\n\t\t Name of the product:";
 				cin>>n;
 				cout<<"\n\t\t Price:";
-				cin>>p;
+				p=getNumberInput();
 				cout<<"\n\t\t Discount:";
-				cin>>d;
+				d=getNumberInput();
 				data1<<" "<<c<<" "<<n<<" "<<p<<" "<<d<<"\n";
 				cout<<"\n\n\t\t Record Edited!!!";
 				token++;
@@ -536,7 +551,7 @@ void shopping::rem()
 	int token=0;
 	cout<<"\n\n\t Delete Product";
 	cout<<"\n\n\t Product Code:";
-	cin>>pkey;
+	pkey=getNumberInput();
 	data.open("database.txt",ios::in);
 	if(!data)
 	{
@@ -569,32 +584,26 @@ void shopping::rem()
 		}
 	}
 }
-void shopping::list()
-{
-    system("cls");
+void shopping::list() {
     fstream data;
     data.open("database.txt", ios::in);
     cout << "\n\n|____________________MENU_________________________\n";
     cout << "| ProNo    Name                      Price\n";
     cout << "|_____________________________________________\n";
-    if (!data)
-    {
+    if (!data) {
         cout << "No products available.\n";
         return;
     }
 
-    data >> pcode >> pname >> price >> dis;
-    while (!data.eof())
-    {
+    while (data >> pcode >> pname >> price >> dis) {
         cout << setw(8) << left << pcode
              << setw(25) << left << pname
              << setw(10) << left << price << "\n";
-        data >> pcode >> pname >> price >> dis;
     }
     data.close();
 }
-void shopping::receipt()
-{
+
+void shopping::receipt() {
     system("cls");
     fstream data;
     int arrc[100]; // array of product codes
@@ -610,9 +619,8 @@ void shopping::receipt()
     getline(cin, customerName);  // Get the full name including spaces
 
     data.open("database.txt", ios::in);
-    if (!data)
-    {
-        cout << "\n\n Empty!!!";
+    if (!data) {
+        cout << "\n\n No products available!";
         return;
     }
     data.close();
@@ -621,17 +629,31 @@ void shopping::receipt()
     cout << "                Place Order              \n";
     cout << "_________________________________________\n";
 
-    do
-    {
+    do {
+    	flag:
         cout << "\n\n Enter Product Code: ";
-        cin >> arrc[c];
-        cout << "\n\n Enter the Product Quantity: ";
-        cin >> arrq[c];
+        arrc[c] = getNumberInput();
 
-        for (int i = 0; i < c; i++)
-        {
-            if (arrc[c] == arrc[i])
-            {
+        bool productFound = false;
+        data.open("database.txt", ios::in);
+        while (data >> pcode >> pname >> price >> dis) {
+            if (pcode == arrc[c]) {
+                productFound = true;
+                break;
+            }
+        }
+        data.close();
+
+        if (!productFound) {
+            cout << "\n\n Product code not found. Try AGAIN!!!";
+            goto flag;
+        }
+
+        cout << "\n\n Enter the Product Quantity: ";
+        arrq[c] = getNumberInput();
+
+        for (int i = 0; i < c; i++) {
+            if (arrc[c] == arrc[i]) {
                 cout << "\n\n Duplicate Product Code. Try AGAIN!!!";
                 goto retry;
             }
@@ -649,14 +671,10 @@ void shopping::receipt()
     cout << "Product No   Product Name            Quantity   Price     Amount      Discounted Amount\n";
     cout << "________________________________________________________________________________________\n";
 
-    for (int i = 0; i < c; i++)
-    {
+    for (int i = 0; i < c; i++) {
         data.open("database.txt", ios::in);
-        data >> pcode >> pname >> price >> dis;
-        while (!data.eof())
-        {
-            if (pcode == arrc[i])
-            {
+        while (data >> pcode >> pname >> price >> dis) {
+            if (pcode == arrc[i]) {
                 amount = price * arrq[i];
                 dis = amount - (amount * dis / 100); // Apply individual product discount
                 total += dis;
@@ -667,50 +685,38 @@ void shopping::receipt()
                      << setw(12) << left << amount
                      << setw(10) << left << dis << "\n";
             }
-            data >> pcode >> pname >> price >> dis;
         }
         data.close();
     }
 
-    // Check if the total is greater than or equal to 500
-    if (total >= 500)
-    {
-        float discount = total * 0.10; // 10% discount
-        total -= discount;
-        cout << "_______________________________________________\n";
-        cout << "Total after 10% discount: " << total << "\n";
-    }
+    float VAT = total * 0.13;  // 13% VAT
+    float serviceCharge = total * 0.10;  // 10% Service Charge
+    float grandTotal = total + VAT + serviceCharge;
 
     cout << "________________________________________________________________________________________\n";
     cout << "Total Amount: " << total << "\n";
+    cout << "VAT (13%): " << VAT << "\n";
+    cout << "Service Charge (10%): " << serviceCharge << "\n";
+    cout << "Grand Total: " << grandTotal << "\n";
 
-    // Ask if the user wants to save the invoice
     char saveChoice;
     cout << "\nDo you want to save this invoice? (y/n): ";
     cin >> saveChoice;
 
-    if (saveChoice == 'y' || saveChoice == 'Y')
-    {
-        ofstream invoiceFile;
-        invoiceFile.open("invoice.txt", ios::app);  // Open invoice.txt in append mode to keep adding invoices
-
-        if (invoiceFile.is_open())
-        {
+    if (saveChoice == 'y' || saveChoice == 'Y') {
+        ofstream invoiceFile("invoice.txt", ios::app);
+        if (invoiceFile.is_open()) {
             invoiceFile << "\n\n\t\t\t__________________INVOICE_________________\n";
-            invoiceFile << "Customer Name: " << customerName << "\n";  // Save the customer name in the invoice file
+            invoiceFile << "Customer Name: " << customerName << "\n";
             invoiceFile << "Product No   Product Name            Quantity   Price     Amount      Discounted Amount\n";
             invoiceFile << "________________________________________________________________________________________\n";
 
-            for (int i = 0; i < c; i++)
-            {
+            for (int i = 0; i < c; i++) {
                 data.open("database.txt", ios::in);
-                data >> pcode >> pname >> price >> dis;
-                while (!data.eof())
-                {
-                    if (pcode == arrc[i])
-                    {
+                while (data >> pcode >> pname >> price >> dis) {
+                    if (pcode == arrc[i]) {
                         amount = price * arrq[i];
-                        dis = amount - (amount * dis / 100); // Apply individual product discount
+                        dis = amount - (amount * dis / 100);
                         invoiceFile << setw(12) << left << pcode
                                     << setw(25) << left << pname
                                     << setw(10) << left << arrq[i]
@@ -718,41 +724,29 @@ void shopping::receipt()
                                     << setw(12) << left << amount
                                     << setw(10) << left << dis << "\n";
                     }
-                    data >> pcode >> pname >> price >> dis;
                 }
                 data.close();
             }
 
-            // Apply total discount if applicable
-            if (total >= 500)
-            {
-                float discount = total * 0.10; // 10% discount
-                total -= discount;
-                invoiceFile << "_______________________________________________\n";
-                invoiceFile << "Total after 10% discount: " << total << "\n";
-            }
-
             invoiceFile << "________________________________________________________________________________________\n";
             invoiceFile << "Total Amount: " << total << "\n";
+            invoiceFile << "VAT (13%): " << VAT << "\n";
+            invoiceFile << "Service Charge (10%): " << serviceCharge << "\n";
+            invoiceFile << "Grand Total: " << grandTotal << "\n";
             invoiceFile.close();
 
             cout << "\nInvoice saved to 'invoice.txt'.\n";
-        }
-        else
-        {
+        } else {
             cout << "\nError saving the invoice.\n";
         }
-    }
-    else
-    {
+    } else {
         cout << "\nInvoice not saved.\n";
     }
 }
-
-
+  
 int main() 
 {
-	system("color 2");
+
     shopping obj;
     obj.menu();
     return 0;
