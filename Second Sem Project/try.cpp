@@ -32,6 +32,7 @@ public:
     void showAllInvoices();
     void searchInvoice();
     int getLastInvoiceNumber();
+    void changepass();
     friend class permission;
 };
 int getNumberInput()
@@ -130,7 +131,7 @@ class permission // login haru ko lagi made this class
     password = getPassword();
 	cout<<"Enter a pin which can be used incase you forget the password";
 	pin= getNumberInput();
-    ofstream pinfile("pin.txt",ios::app);
+    ofstream pinfile("pin.txt",ios::out);
     if(pinfile.is_open())
     {
     	pinfile<<pin;
@@ -155,47 +156,39 @@ class permission // login haru ko lagi made this class
     }
     
 }
-	void changepass()
-	{	
+	void changepass() {
 	system("cls");
-	ifstream file("users.txt");
-ofstream tempfile("temp.txt");
-string storedusername, storedpass;
-string username, newpass;
+	cout<<"Account recovery"<<endl;
+    fstream file("users.txt");
+    string storedusername, storedpass, username, newpass;
+    bool userFound = false;
 
-cout << "Enter your username: ";
-cin >> username;
-
-bool userFound = false;
-
-while (file >> storedusername >> storedpass) {
-    if (username == storedusername) {
-        cout << "Enter new password: ";
-        newpass = getPassword();  // Assuming getPassword() handles secure input
-        tempfile << storedusername << " " << newpass << endl;  // Write updated password
-        userFound = true;
-    } else {
-        tempfile << storedusername << " " << storedpass << endl;  // Write other users unchanged
+    if (!file.is_open()) {
+        cout << "Error opening files!" << endl;
+        return;
     }
+
+    cout << "Enter your username: ";
+    cin >> username;
+
+    while (file >> storedusername >> storedpass) {
+        if (username == storedusername) {
+        	file.close();
+        	fstream file("users.txt",ios::out);
+            newpass=getPassword();  // Replace with getPassword() if needed
+            file << storedusername << " " << newpass << endl;
+            userFound = true;
+        } 
+    }
+    file.close();
+    if(userFound)
+    {
+    	cout<<"Password changed succesfully";
+//	   	logIn();
+	}
+    
 }
 
-
-file.close();
-tempfile.close();
-
-if (userFound) {
-        if (remove("users.txt") != 0) {
-            perror("Error deleting original file");
-        } else if (rename("temp.txt", "users.txt") != 0) {
-            perror("Error renaming temporary file");
-        } else {
-            cout << "Password updated successfully!" << endl;
-        } }
-		else {
-    remove("temp.txt");  // Clean up temp file if user not found
-    cout << "Username not found!" << endl;
-} 
-}
     int logIn() 
 	{
 		system("cls");
@@ -252,8 +245,13 @@ if (userFound) {
 
             attempts--;
            
+			 if (attempts > 0) 
+			{
+                cout << "Invalid username or password. You have " << attempts << " attempt(s) left.\n";
+            }
             if(attempts==0)
             {
+            
             	int recoverpin,storedpin,check=0;
             	cout<<"Enter pin to recoverr id:";
             	recoverpin= getNumberInput();
@@ -273,6 +271,13 @@ if (userFound) {
                 	{
                 		cout<<"Incorrect pin";
 					}
+					else
+					{
+						if(logIn()==1)
+						{
+							return 1;
+						}
+					}
                 	file.close();
             	}
 				else
@@ -281,10 +286,6 @@ if (userFound) {
 				}	 
             	
 			}
-			 if (attempts > 0) 
-			{
-                cout << "Invalid username or password. You have " << attempts << " attempt(s) left.\n";
-            }
         }
         
 
